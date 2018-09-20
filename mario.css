@@ -1,0 +1,70 @@
+* {
+
+	padding: 0;
+
+	margin: 0;
+
+	box-sizing:
+ border-box;
+
+}
+
+.clear {
+
+	clear: both;
+
+}
+
+
+body {
+
+	-webkit-background-size: cover;
+
+	background-size: cover;
+
+}
+
+#score {
+
+	width: 350px;
+
+	height: 40px;
+
+	padding-top: 5px;
+
+	margin: 50px auto;
+
+	text-align: center;
+
+	border: 1px solid #000;
+
+	border-radius: 20px;
+
+	-webkit-background-size: cover;
+
+	background-size: cover;
+
+	font-size: 1.5rem;
+
+	font-weight: bold;
+
+}
+
+
+#canvas {
+
+	width: 1200px;
+
+	height: 600px;
+
+	display: block;
+
+	margin: 30px auto;
+
+	border: 1px solid #000;
+
+	-webkit-background-size: 100% 100%;
+
+	background-size: 100% 100%;
+
+}
