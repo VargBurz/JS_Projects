@@ -23,6 +23,21 @@ function drawMario() {
 	ctx.fillRect(x, y, 28, 28)
 }
 
+function drawWall() {
+	for (var i = 0; i < WALL_PLACE.length; i++) {
+		var x = WALL_PLACE[i].x*15
+		var y = WALL_PLACE[i].y*15
+		ctx.fillStyle = 'brown'
+		ctx.fillRect(x, y, 28, 28)
+	}
+}
+
+function createWall() {
+	for (var i = 1; i < WALL_LENGTH; i++) {
+		WALL_PLACE[i] = {x: WALL_PLACE[i - 1].x + 1, y: WALL_PLACE[0].y}
+	}
+}
+
 function draw() {
 	ctx.clearRect(0, 0 ,1200, 600)
 	drawMario()
@@ -67,6 +82,7 @@ function game() {
 	ctx.clearRect(0, 0 ,1200, 600)
 	document.onkeydown
 	drawMario()
+	drawWall()
 }
 
 function marioJump() {
@@ -75,5 +91,5 @@ function marioJump() {
 	setTimeout(setInterDown, TIMER * 5)	
 }	
 
-
+createWall()
 setInterval(game,  TIMER)
