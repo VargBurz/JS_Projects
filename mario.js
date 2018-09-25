@@ -26,6 +26,13 @@ var MARIO_PLACE = [
 		},
 ]
 
+var LAND = [
+	{
+		x: 1,
+		y: 31,
+	},
+]
+
 var WALL_PLACE = [
 		{
 			x:20,
@@ -40,7 +47,7 @@ function drawMario() {
 	var x = MARIO_PLACE[0].x*15
 	var y = MARIO_PLACE[0].y*15
 	ctx.fillStyle = 'black'
-	ctx.fillRect(x, y, 28, 28)
+	ctx.fillRect(x, y, 14, 14)
 }
 
 function drawWall() {
@@ -48,7 +55,16 @@ function drawWall() {
 		var x = WALL_PLACE[i].x*15
 		var y = WALL_PLACE[i].y*15
 		ctx.fillStyle = 'brown'
-		ctx.fillRect(x, y, 28, 28)
+		ctx.fillRect(x, y, 14, 14)
+	}
+}
+
+function drawLand() {
+	for (var i = 0; i < LAND.length; i++){
+		var x = LAND[i].x*15
+		var y = LAND[i].y*15
+		ctx.fillStyle = 'green'
+		ctx.fillRect(x, y, 14, 14)
 	}
 }
 
@@ -58,10 +74,20 @@ function createWall() {
 	}
 }
 
+function createLand() {
+	for (var i = 1; i < 100; i++){
+		LAND[i] = {x: i, y: 31}
+	}
+}
+
 function draw() {
 	ctx.clearRect(0, 0 ,1200, 600)
 	drawMario()
 }
+
+var fun = function() {
+		DIR = 'stay'
+	}
 
 function up() {
 	var o = {}
@@ -80,7 +106,7 @@ function down() {
 		var o = {}
 		o.x = MARIO_PLACE[0].x
 		o.y = MARIO_PLACE[0].y + 1
-		if ((isExist(WALL_PLACE, o) == false) && (o.y < EARTH_LVL)) {
+		if ((isExist(WALL_PLACE, o) == false) && (o.y < EARTH_LVL + 1)) {
 			MARIO_PLACE[0].y = MARIO_PLACE[0].y + 1
 		}
 	}
@@ -118,9 +144,9 @@ document.onkeydown = function checkKey(event) {
 			}
 			for(var i = JUMP_LENGTH + 4; i < JUMP_LENGTH*2 +4; i++) {
 				setTimeout(down, TIMER * i)
-				//DIR = 'stay'
 			}
-			setTimeout(console.log(DIR), TIMER*12)
+			var t = JUMP_LENGTH*2 + 5
+			setTimeout(fun, TIMER * t)
 			
 		}
 	}
@@ -130,13 +156,15 @@ document.onkeydown = function checkKey(event) {
 function game() {
 	accessKeyboard = true
 	ctx.clearRect(0, 0 ,1200, 600)
-	gravitation()
+	checkCondition() 
 	document.onkeydown
 	drawMario()
 	drawWall()
+	drawLand()
 }
 
 createWall()
+createLand()
 setInterval(game,  TIMER)
 
 
@@ -150,11 +178,25 @@ function isExist(l, x){
 	return false
 }
 
-function gravitation() {
-	if(DIR == 'stay') {
-		while (MARIO_PLACE[0].y < EARTH_LVL){
-			down()
-		}
+function checkCondition() {
+	if (DIR == 'stay'){
+		gravitation()
 	}
 }
 
+function gravitation() {
+	
+	while ((MARIO_PLACE[0].y < EARTH_LVL) && checkLand()){
+		down()
+	}
+	
+}
+
+function checkLand() {
+	for (var i = 0; i < WALL_PLACE.length; i++) {
+		if ((MARIO_PLACE[0].x == WALL_PLACE[i].x) && (MARIO_PLACE[0].y == WALL_PLACE[i].y - 1)) {
+			return true
+		}
+	}
+	return false
+}
