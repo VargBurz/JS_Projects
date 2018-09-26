@@ -6,6 +6,8 @@ var TIMER = 100
 
 var SCORE = 0
 
+var LIFE = 3
+
 var DIR = 'stay'
 
 var JUMP_LENGTH = 8
@@ -13,7 +15,8 @@ var JUMP_LENGTH = 8
 var WALL_PLACE = [
 		{
 			x:20,
-			y:25,			
+			y:25,
+			l:2,
 		},
 ]
 
@@ -96,13 +99,13 @@ function createLand() {
 
 function createWall() {
 	for (var i = 1; i < WALL_LENGTH; i++) {
-		WALL_PLACE[i] = {x: WALL_PLACE[i - 1].x + 1, y: WALL_PLACE[0].y}
+		WALL_PLACE[i] = {x: WALL_PLACE[i - 1].x + 1, y: WALL_PLACE[0].y, l: 2}
 	}
 	
-	WALL_PLACE[WALL_LENGTH] = {x: WALL_PLACE[WALL_LENGTH - 1].x + 4, y: WALL_PLACE[WALL_LENGTH - 1].y - 3}
+	WALL_PLACE[WALL_LENGTH] = {x: WALL_PLACE[WALL_LENGTH - 1].x + 4, y: WALL_PLACE[WALL_LENGTH - 1].y - 3, l:2}
 	
 	for (var i = WALL_LENGTH + 1; i < WALL_LENGTH * 2; i++) {
-		WALL_PLACE[i] = {x: WALL_PLACE[i - 1].x + 1, y: WALL_PLACE[WALL_LENGTH].y}
+		WALL_PLACE[i] = {x: WALL_PLACE[i - 1].x + 1, y: WALL_PLACE[WALL_LENGTH].y, l: 2}
 	}
 	
 }
@@ -131,17 +134,20 @@ function up() {
 		MARIO_PLACE[0].y = MARIO_PLACE[0].y - 2
 	}
 	else {
-		MARIO_PLACE[0].y = MARIO_PLACE[0].y - 1
+		MARIO_PLACE[0].y = MARIO_PLACE[0].y
+		hitWall(o)
 	}
 }
 
 function down() {
-	
 	var o = {}
 	o.x = MARIO_PLACE[0].x
 	o.y = MARIO_PLACE[0].y + 1
 	if (isExist(WALL_PLACE, o) == false) {
 		MARIO_PLACE[0].y = MARIO_PLACE[0].y + 1
+	}
+	if (MARIO_PLACE[0].y > LAND[0].y + 2) {
+		death()
 	}
 }
 
@@ -232,9 +238,30 @@ function fingIndex(el, list) {
 
 function drawScore(){
 	var board = document.getElementById('score')
-	board.innerHTML = 'SCORE:  ' + SCORE
+	board.innerHTML = 'SCORE:  ' + SCORE +'  |   ' + 'LIFE:  ' + LIFE
 }
 
+function death() {
+	if (LIFE > 0) {
+		alert(' - life')
+		MARIO_PLACE[0] = {x:1,y:30}
+		LIFE -=1
+	}
+	else {
+		alert('END GAME\nYOUR SCORE: ' + SCORE)
+	}
+}
+
+function hitWall(o) {
+	var i = fingIndex(o, WALL_PLACE)
+	if(WALL_PLACE[i].l > 0){
+		WALL_PLACE[i].l -= 1
+	}
+	else {
+		WALL_PLACE.splice(i, 1)
+	}
+}
+	
 createLand()
 createWall()
 createCoins()
