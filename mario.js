@@ -4,11 +4,11 @@ var ctx = canvas.getContext('2d')
 
 var TIMER = 100
 
+var SCORE = 0
+
 var DIR = 'stay'
 
 var JUMP_LENGTH = 8
-
-var EARTH_LVL = 30
 
 var WALL_PLACE = [
 		{
@@ -19,18 +19,25 @@ var WALL_PLACE = [
 
 var WALL_LENGTH = 6
 
+var LAND = [
+	{
+		x:0,
+		y:31,
+	},
+]
+
+var COINS = [
+	{
+		x:2,
+		y:30,
+	},
+]
+
 var MARIO_PLACE = [
 		{
 			x:1,
 			y:30,			
 		},
-]
-
-var LAND = [
-	{
-		x: 1,
-		y: 31,
-	},
 ]
 
 var WALL_PLACE = [
@@ -46,17 +53,10 @@ function drawMario() {
 	
 	var x = MARIO_PLACE[0].x*15
 	var y = MARIO_PLACE[0].y*15
-	ctx.fillStyle = 'black'
+	ctx.fillStyle = 'blue'
 	ctx.fillRect(x, y, 14, 14)
-}
-
-function drawWall() {
-	for (var i = 0; i < WALL_PLACE.length; i++) {
-		var x = WALL_PLACE[i].x*15
-		var y = WALL_PLACE[i].y*15
-		ctx.fillStyle = 'brown'
-		ctx.fillRect(x, y, 14, 14)
-	}
+	ctx.fillStyle = 'red'
+	ctx.fillRect(x, y-15, 14, 14)
 }
 
 function drawLand() {
@@ -68,9 +68,23 @@ function drawLand() {
 	}
 }
 
-function createWall() {
-	for (var i = 1; i < WALL_LENGTH; i++) {
-		WALL_PLACE[i] = {x: WALL_PLACE[i - 1].x + 1, y: WALL_PLACE[0].y}
+function drawWall() {
+	for (var i = 0; i < WALL_PLACE.length; i++) {
+		var x = WALL_PLACE[i].x*15
+		var y = WALL_PLACE[i].y*15
+		ctx.fillStyle = 'brown'
+		ctx.fillRect(x, y, 14, 14)
+	}
+}
+
+function drawCoins() {
+	for (var i = 0; i < COINS.length; i++) {
+		var x = COINS[i].x*15
+		var y = COINS[i].y*15
+		ctx.fillStyle = 'yellow'
+		ctx.fillRect(x, y, 14, 14)
+		ctx.fillStyle = 'white'
+		ctx.fillRect(x+3, y+3, 8, 8)
 	}
 }
 
@@ -80,41 +94,57 @@ function createLand() {
 	}
 }
 
-function draw() {
-	ctx.clearRect(0, 0 ,1200, 600)
-	drawMario()
+function createWall() {
+	for (var i = 1; i < WALL_LENGTH; i++) {
+		WALL_PLACE[i] = {x: WALL_PLACE[i - 1].x + 1, y: WALL_PLACE[0].y}
+	}
+	
+	WALL_PLACE[WALL_LENGTH] = {x: WALL_PLACE[WALL_LENGTH - 1].x + 4, y: WALL_PLACE[WALL_LENGTH - 1].y - 3}
+	
+	for (var i = WALL_LENGTH + 1; i < WALL_LENGTH * 2; i++) {
+		WALL_PLACE[i] = {x: WALL_PLACE[i - 1].x + 1, y: WALL_PLACE[WALL_LENGTH].y}
+	}
+	
 }
 
-var fun = function() {
-		DIR = 'stay'
+function createCoins() {
+	for (var i = 5; i < LAND.length; i++) {
+		var r = Math.round(Math.random())
+		if (r == 1) {
+			COINS.push({x:i, y:LAND[i].y - 1})
+		}
 	}
+	
+	for (var i = 0; i < WALL_PLACE.length; i++) {
+		var r = Math.round(Math.random())
+		if (r == 1) {
+			COINS.push({x:WALL_PLACE[i].x, y:WALL_PLACE[i].y - 1})
+		}
+	}
+}
 
 function up() {
 	var o = {}
 	o.x = MARIO_PLACE[0].x
-	o.y = MARIO_PLACE[0].y - 1
+	o.y = MARIO_PLACE[0].y - 2
 	if (isExist(WALL_PLACE, o) == false) {
+		MARIO_PLACE[0].y = MARIO_PLACE[0].y - 2
+	}
+	else {
 		MARIO_PLACE[0].y = MARIO_PLACE[0].y - 1
 	}
 }
 
 function down() {
-	if ((DIR == 'stay') && (MARIO_PLACE[0].y < EARTH_LVL)) {
+	
+	var o = {}
+	o.x = MARIO_PLACE[0].x
+	o.y = MARIO_PLACE[0].y + 1
+	if (isExist(WALL_PLACE, o) == false) {
 		MARIO_PLACE[0].y = MARIO_PLACE[0].y + 1
-	}
-	if (DIR == 'up') {
-		var o = {}
-		o.x = MARIO_PLACE[0].x
-		o.y = MARIO_PLACE[0].y + 1
-		if ((isExist(WALL_PLACE, o) == false) && (o.y < EARTH_LVL + 1)) {
-			MARIO_PLACE[0].y = MARIO_PLACE[0].y + 1
-		}
 	}
 }
 
-function stay() {
-	MARIO_PLACE[0].y = MARIO_PLACE[0].y
-}
 
 document.onkeydown = function checkKey(event) {
 	if(accessKeyboard) {
@@ -135,39 +165,16 @@ document.onkeydown = function checkKey(event) {
 			}
 		}
 		if(event.keyCode == 32) {
-			//DIR = 'up' TODO: no double jump
-			//marioJump()
-			DIR = 'up'
-			console.log(DIR)
-			for(var i = 0; i < JUMP_LENGTH; i++) {
-				setTimeout(up, TIMER * i)
+			if (DIR != 'fly') {
+				DIR = 'fly'
+				for(var i = 0; i < JUMP_LENGTH; i++) {
+					setTimeout(up, TIMER * i)
+				}
 			}
-			for(var i = JUMP_LENGTH + 4; i < JUMP_LENGTH*2 +4; i++) {
-				setTimeout(down, TIMER * i)
-			}
-			var t = JUMP_LENGTH*2 + 5
-			setTimeout(fun, TIMER * t)
-			
 		}
 	}
 	accessKeyboard = false
 }
-
-function game() {
-	accessKeyboard = true
-	ctx.clearRect(0, 0 ,1200, 600)
-	checkCondition() 
-	document.onkeydown
-	drawMario()
-	drawWall()
-	drawLand()
-}
-
-createWall()
-createLand()
-setInterval(game,  TIMER)
-
-
 
 function isExist(l, x){
 	for (var i = 0; i < l.length; i++){
@@ -178,25 +185,57 @@ function isExist(l, x){
 	return false
 }
 
-function checkCondition() {
-	if (DIR == 'stay'){
-		gravitation()
-	}
+function game() {
+	accessKeyboard = true
+	ctx.clearRect(0, 0 ,1200, 600)
+	gravitation()	
+	document.onkeydown
+	catchCoin()
+	drawWall()
+	drawLand()
+	drawCoins()
+	drawMario()
+	drawScore()
 }
 
 function gravitation() {
-	
-	while ((MARIO_PLACE[0].y < EARTH_LVL) && checkLand()){
+	var o = {}
+	o.x = MARIO_PLACE[0].x
+	o.y = MARIO_PLACE[0].y + 1
+	if ((isExist(LAND, o) == false) && (isExist(WALL_PLACE, o) == false)){
+		DIR = 'fly'
 		down()
 	}
-	
+	else {
+		DIR = 'stay'
+	}
 }
 
-function checkLand() {
-	for (var i = 0; i < WALL_PLACE.length; i++) {
-		if ((MARIO_PLACE[0].x == WALL_PLACE[i].x) && (MARIO_PLACE[0].y == WALL_PLACE[i].y - 1)) {
-			return true
+function catchCoin() {
+	var o = {}
+	o.x = MARIO_PLACE[0].x
+	o.y = MARIO_PLACE[0].y
+	if (isExist(COINS, o)) {
+		COINS.splice(fingIndex(o, COINS),1)
+		SCORE += 1
+	}
+}
+
+function fingIndex(el, list) {
+	for (var i =0; i<list.length; i++){
+		if ((list[i].x == el.x) && (list[i].y == el.y)){
+			return i
 		}
 	}
-	return false
+	return 'nothing'
 }
+
+function drawScore(){
+	var board = document.getElementById('score')
+	board.innerHTML = 'SCORE:  ' + SCORE
+}
+
+createLand()
+createWall()
+createCoins()
+setInterval(game,  TIMER)
