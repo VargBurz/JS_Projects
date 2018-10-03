@@ -10,6 +10,8 @@ var LIFE = 3
 
 var DIR = 'stay'
 
+var UP_LEVEL = 0
+
 var JUMP_LENGTH = 8
 
 var WALL_PLACE = [
@@ -58,8 +60,8 @@ function drawMario() {
 	var y = MARIO_PLACE[0].y*15
 	ctx.fillStyle = 'blue'
 	ctx.fillRect(x, y, 14, 14)
-	ctx.fillStyle = 'red'
-	ctx.fillRect(x, y-15, 14, 14)
+	//ctx.fillStyle = 'red'
+	//ctx.fillRect(x, y-15, 14, 14)
 }
 
 function drawLand() {
@@ -127,15 +129,18 @@ function createCoins() {
 }
 
 function up() {
+		
 	var o = {}
 	o.x = MARIO_PLACE[0].x
-	o.y = MARIO_PLACE[0].y - 2
+	o.y = MARIO_PLACE[0].y - 1
 	if (isExist(WALL_PLACE, o) == false) {
-		MARIO_PLACE[0].y = MARIO_PLACE[0].y - 2
+		UP_LEVEL += 1
+		MARIO_PLACE[0].y = MARIO_PLACE[0].y - 1
 	}
 	else {
-		MARIO_PLACE[0].y = MARIO_PLACE[0].y
+		MARIO_PLACE[0].y = MARIO_PLACE[0].y - 1
 		hitWall(o)
+		UP_LEVEL  = JUMP_LENGTH
 	}
 }
 
@@ -171,15 +176,27 @@ document.onkeydown = function checkKey(event) {
 			}
 		}
 		if(event.keyCode == 32) {
-			if (DIR != 'fly') {
+			if (DIR != 'fly' && DIR != 'fall') {
 				DIR = 'fly'
-				for(var i = 0; i < JUMP_LENGTH; i++) {
-					setTimeout(up, TIMER * i)
-				}
+				UP_LEVEL = 1
+				//MARIO_PLACE[0].y = MARIO_PLACE[0].y - 1
+				//for(var i = 0; i < JUMP_LENGTH; i++) {
+				//	setTimeout(up, TIMER * i)
+				//}
 			}
 		}
 	}
 	accessKeyboard = false
+}
+
+function checkJump() {
+	if ((UP_LEVEL < JUMP_LENGTH ) && (DIR == 'fly')) {
+		up()
+	}
+	if ((UP_LEVEL == JUMP_LENGTH ) && (DIR == 'fly')) {
+		DIR = 'fall'
+		down()
+	}
 }
 
 function isExist(l, x){
@@ -196,6 +213,7 @@ function game() {
 	ctx.clearRect(0, 0 ,1200, 600)
 	gravitation()	
 	document.onkeydown
+	checkJump()
 	catchCoin()
 	drawWall()
 	drawLand()
@@ -208,11 +226,11 @@ function gravitation() {
 	var o = {}
 	o.x = MARIO_PLACE[0].x
 	o.y = MARIO_PLACE[0].y + 1
-	if ((isExist(LAND, o) == false) && (isExist(WALL_PLACE, o) == false)){
-		DIR = 'fly'
+	if ((isExist(LAND, o) == false) && (isExist(WALL_PLACE, o) == false) && DIR != 'fly'){
+		DIR = 'fall'
 		down()
 	}
-	else {
+	if ((isExist(LAND, o) == false || isExist(WALL_PLACE, o) == false) && DIR != 'fly'){
 		DIR = 'stay'
 	}
 }
