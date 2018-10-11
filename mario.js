@@ -52,6 +52,13 @@ var WALL_PLACE = [
 		},
 ]
 
+var TURTLE_PLACE = [
+		{
+			x:40,
+			y:30,			
+		},
+]
+
 var WALL_LENGTH = 6
 
 function drawMario() {
@@ -214,10 +221,12 @@ function game() {
 	gravitation()	
 	document.onkeydown
 	checkJump()
+	turt_1.moveTurtle()
 	catchCoin()
 	drawWall()
 	drawLand()
 	drawCoins()
+	turt_1.drawTurtle()
 	drawMario()
 	drawScore()
 }
@@ -279,8 +288,76 @@ function hitWall(o) {
 		WALL_PLACE.splice(i, 1)
 	}
 }
+
+class Turtle {
+	init() {
+		turt_dir = 'right'
+		
+	}
+	
+	constructor(number) {
+		this.number = number
+		this.turt_dir = 'right'
+	}
+	
+	createTurtle(){
+		//for (var i = 0; i < this.number; i++) {
+		TURTLE_PLACE[0] = {x:45, y:30}
+		this.place = 45
+		//}
+	}
+	
+	moveTurtle() {
+		
+		if (this.turt_dir == 'right') {
+			this.moveRight()
+		}
+		else if (this.turt_dir == 'left') {
+			this.moveLeft()
+		}
+		
+	}
+	
+	moveRight() {
+		this.turt_dir = 'right'
+		if (TURTLE_PLACE[0].x < 45 + 4) {
+			TURTLE_PLACE[0].x = TURTLE_PLACE[0].x + 0.5
+		}
+		else {
+			this.moveLeft()
+		}
+	}
+	
+	moveLeft() {
+		this.turt_dir = 'left'
+		if (TURTLE_PLACE[0].x > 45 - 4) {
+			TURTLE_PLACE[0].x = TURTLE_PLACE[0].x - 0.5
+		}
+		else {
+			this.moveRight()
+		}
+	}
+	
+	drawTurtle() {
+		var x = TURTLE_PLACE[0].x*15
+		var y = TURTLE_PLACE[0].y*15
+		ctx.fillStyle = 'black'
+		ctx.fillRect(x, y, 14, 14)
+	}
+	
+	Kill() {
+		
+	}
+	
+	death() {
+		
+	}
+	
+}
 	
 createLand()
 createWall()
 createCoins()
+var turt_1 = new Turtle(1)
+turt_1.createTurtle()
 setInterval(game,  TIMER)
