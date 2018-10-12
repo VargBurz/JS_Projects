@@ -78,9 +78,9 @@ function drawMario() {
 	var x = MARIO_PLACE[0].x*15
 	var y = MARIO_PLACE[0].y*15
 	ctx.fillStyle = 'blue'
-	ctx.fillRect(x, y, 14, 14)
-	//ctx.fillStyle = 'red'
-	//ctx.fillRect(x, y-15, 14, 14)
+	ctx.fillRect(x, y, 14, 7)
+	ctx.fillStyle = 'red'
+	ctx.fillRect(x, y + 7, 14, 7)
 }
 
 function drawLand() {
@@ -215,9 +215,19 @@ function checkFB() {
 			}
 		}
 		else if(DIR_X == 'left') {
-			FIRE_BALL[0] = {x:FIRE_BALL[0].x - 1, y:FIRE_BALL[0].y}
-			drawFireBall()
-			FB_LEVEL = FB_LEVEL - 1
+			var o = {}
+			o.x = FIRE_BALL[0].x - 1
+			o.y = FIRE_BALL[0].y
+			if(isExist(WALL_PLACE, o) == false) {
+				FIRE_BALL[0] = {x:FIRE_BALL[0].x - 1, y:FIRE_BALL[0].y}
+				drawFireBall()
+				FB_LEVEL = FB_LEVEL - 1
+			}
+			else {
+				FIRE_BALL[0] = {x:FIRE_BALL[0].x - 1, y:FIRE_BALL[0].y}
+				hitWall(o)
+				FB_LEVEL = 0
+			}
 		}
 	}
 }
@@ -259,10 +269,6 @@ document.onkeydown = function checkKey(event) {
 			if (DIR != 'fly' && DIR != 'fall') {
 				DIR = 'fly'
 				UP_LEVEL = 1
-				//MARIO_PLACE[0].y = MARIO_PLACE[0].y - 1
-				//for(var i = 0; i < JUMP_LENGTH; i++) {
-				//	setTimeout(up, TIMER * i)
-				//}
 			}
 		}
 		if(event.keyCode == 101) {
@@ -374,6 +380,7 @@ class Turtle {
 	constructor(number) {
 		this.number = number
 		this.turt_dir = 'right'
+		this.health = 3
 		//this.place
 	}
 	
@@ -424,6 +431,12 @@ class Turtle {
 	
 	Kill() {
 		
+	}
+	
+	turtleGetHit(val) {
+		this.health -= val
+		if (this.health < 0)
+			this.health = 0
 	}
 	
 	death() {
@@ -482,7 +495,6 @@ class Fireball {
 	
 createLand()
 createWall()
-console.log(WALL_PLACE)
 createCoins()
 var turt_1 = new Turtle(1)
 turt_1.createTurtle()
